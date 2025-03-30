@@ -113,7 +113,7 @@ data$GENERACION <- as.numeric(data$GENERACION)
 ### Verificar cambios
 
 ```{r}
-str(data)
+glimpse(data)
 ```
 ### Determinar valores nulos en el conjunto de datos
 
@@ -121,11 +121,16 @@ str(data)
 if (sum(is.na(data)) == 0) {
   cat("No existen datos nulos\n")
 } else {
-  # Mostrar las posiciones de los valores nulos
   cat("Posiciones de los valores nulos:\n")
   print(which(is.na(data), arr.ind = TRUE))
 }
 ```
+### Determinar cadenas vacias en el conjunto de datos
+
+```{r}
+colSums(data == "")
+```
+
 ### Determinar valores atipicos en el conjunto de datos y definir margenes
 
 ```{r}
@@ -182,5 +187,123 @@ mtext(paste("Atípicos: ", length(outliers_velocidad), " | Márgenes: ", round(l
 
 par(mfrow = c(1, 1))
 
+
+```
+### Determinar tendencia de variables usando histogramas y graficos de dispersion
+
+### Histogramas
+```{r}
+
+hist(data$TOTAL, main = "Histograma de TOTAL", col = "lightblue", xlab = "TOTAL", border = "blue")
+hist(data$`PUNTOS SALUD`, main = "Histograma de PUNTOS SALUD", col = "lightgreen", xlab = "PUNTOS SALUD", border = "black")
+hist(data$ATAQUE, main = "Histograma de ATAQUE", col = "lightcoral", xlab = "ATAQUE", border = "black")
+hist(data$DEFENSA, main = "Histograma de DEFENSA", col = "lightyellow", xlab = "DEFENSA", border = "black")
+hist(data$`ATAQUE ESPECIAL`, main = "Histograma de ATAQUE ESPECIAL", col = "lightpink", xlab = "ATAQUE ESPECIAL", border = "black")
+hist(data$`DEFENSA ESPECIAL`, main = "Histograma de DEFENSA ESPECIAL", col = "lightyellow", xlab = "DEFENSA ESPECIAL", border = "black")
+hist(data$VELOCIDAD, main = "Histograma de VELOCIDAD", col = "red", xlab = "VELOCIDAD", border = "black")
+
+```
+
+### Graficos de dispersion
+
+```{r}
+plot(data$TOTAL, main = "Dispersión de TOTAL", xlab = "Índice", ylab = "TOTAL", col = "blue", pch = 16)
+plot(data$`PUNTOS SALUD`, main = "Dispersión de PUNTOS SALUD", xlab = "Índice", ylab = "PUNTOS SALUD", col = "green", pch = 16)
+plot(data$ATAQUE, main = "Dispersión de ATAQUE", xlab = "Índice", ylab = "ATAQUE", col = "red", pch = 16)
+plot(data$DEFENSA, main = "Dispersión de DEFENSA", xlab = "Índice", ylab = "DEFENSA", col = "orange", pch = 16)
+plot(data$`ATAQUE ESPECIAL`, main = "Dispersión de ATAQUE ESPECIAL", xlab = "Índice", ylab = "ATAQUE ESPECIAL", col = "purple", pch = 16)
+plot(data$`DEFENSA ESPECIAL`, main = "Dispersión de DEFENSA ESPECIAL", xlab = "Índice", ylab = "DEFENSA ESPECIAL", col = "pink", pch = 16)
+plot(data$VELOCIDAD, main = "Dispersión de VELOCIDAD", xlab = "Índice", ylab = "VELOCIDAD", col = "brown", pch = 16)
+
+```
+
+### Funciones para manejar valores atipicos y cadenas vacias
+
+### Manejar cadenas vacias
+```{r}
+reemplazar_vacios <- function(data, columna, valor_reemplazo = "Sin especificar") {
+  if (is.factor(data[[columna]])) {
+    data[[columna]] <- as.character(data[[columna]])
+    data[[columna]][data[[columna]] == ""] <- valor_reemplazo
+    data[[columna]] <- factor(data[[columna]])
+  } else if (is.character(data[[columna]])) {
+    data[[columna]][data[[columna]] == ""] <- valor_reemplazo
+  } else if (is.numeric(data[[columna]])) {
+    data[[columna]][is.na(data[[columna]])] <- 0
+  }
+  return(data)
+}
+
+```
+
+### Manejar datos atipicos
+```{r}
+manejar_atipicos <- function(data) {
+  for (i in seq_along(data)) {
+    if (is.numeric(data[[i]])) {
+      Q1 <- quantile(data[[i]], 0.25, na.rm = TRUE)
+      Q3 <- quantile(data[[i]], 0.75, na.rm = TRUE)
+      IQR <- Q3 - Q1
+      lim_inferior <- Q1 - 1.5 * IQR
+      lim_superior <- Q3 + 1.5 * IQR
+      data[[i]][data[[i]] < lim_inferior] <- lim_inferior
+      data[[i]][data[[i]] > lim_superior] <- lim_superior
+    }
+  }
+  return(data)
+}
+```
+
+### Aplicar correcciones
+
+```{r}
+data_con_vacios_reemplazados <- reemplazar_vacios(data, "TIPO 2")
+data_corregida <- manejar_atipicos(data_con_vacios_reemplazados)
+head(data_corregida)
+data_copy <- data
+```
+### Respaldo de data original y data pasa a ser data ya corregida
+
+```{r}
+data_copy <- data
+data <- data_corregida
+View(data)
+```
+
+
+### Validar correccion de atipicos
+
+```{r}
+par(mfrow = c(3, 3))
+
+boxplot(data$TOTAL, main = "Boxplot de TOTAL\n", col = "lightblue")
+boxplot_total <- boxplot.stats(data$TOTAL)
+mtext(paste("Atípicos: ", length(boxplot_total$out)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$`PUNTOS SALUD`, main = "Boxplot de PUNTOS SALUD\n", col = "lightgreen")
+boxplot_puntos_salud <- boxplot.stats(data$`PUNTOS SALUD`)
+mtext(paste("Atípicos: ", length(boxplot_puntos_salud$out)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$ATAQUE, main = "Boxplot de ATAQUE\n", col = "lightcoral")
+boxplot_ataque <- boxplot.stats(data$ATAQUE)
+mtext(paste("Atípicos: ", length(boxplot_ataque$out)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$DEFENSA, main = "Boxplot de DEFENSA\n", col = "lightyellow")
+boxplot_defensa <- boxplot.stats(data$DEFENSA)
+mtext(paste("Atípicos: ", length(boxplot_defensa$out)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$`ATAQUE ESPECIAL`, main = "Boxplot de ATAQUE ESPECIAL\n", col = "lightpink")
+boxplot_ataque_especial <- boxplot.stats(data$`ATAQUE ESPECIAL`)
+mtext(paste("Atípicos: ", length(boxplot_ataque_especial$out)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$`DEFENSA ESPECIAL`, main = "Boxplot de DEFENSA ESPECIAL\n", col = "lightyellow")
+boxplot_defensa_especial <- boxplot.stats(data$`DEFENSA ESPECIAL`)
+mtext(paste("Atípicos: ", length(boxplot_defensa_especial$out)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$VELOCIDAD, main = "Boxplot de VELOCIDAD\n", col = "red")
+boxplot_velocidad <- boxplot.stats(data$VELOCIDAD)
+mtext(paste("Atípicos: ", length(boxplot_velocidad$out)), side = 3, line = 0.5, cex = 0.8)
+
+par(mfrow = c(1, 1))
 
 ```
