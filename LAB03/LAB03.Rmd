@@ -13,6 +13,7 @@ author: "Gerald Lopez, Marleny Molina"
 
 ```{r, message=FALSE, warning=FALSE}
 library(dplyr)
+library(ggplot2)
 ```
 
 
@@ -306,4 +307,26 @@ mtext(paste("Atípicos: ", length(boxplot_velocidad$out)), side = 3, line = 0.5,
 
 par(mfrow = c(1, 1))
 
+```
+
+## Visualizacion de datos
+
+### Funcion para graficar las variables categoricas
+
+```{r}
+graficar_categoricas <- function(data, columna) {
+  ggplot(data, aes(x = .data[[columna]])) +
+    geom_bar(fill = "steelblue") +
+    labs(title = paste("Distribución de", columna),
+         x = columna,
+         y = "Cantidad") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+```
+### Graficar variables categoricas mediante el uso de la funcion
+
+```{r}
+graficar_categoricas(data, "TIPO 1")  
+graficar_categoricas(data, "TIPO 2")  
 ```
