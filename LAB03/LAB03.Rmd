@@ -1,0 +1,186 @@
+---
+title: "LAB03"
+output: html_document
+author: "Gerald Lopez, Marleny Molina"
+---
+# En este lab se utilizara el archivo .csv de pokemon y se le aplicara el EDA
+
+
+## Intalacion (si fuera necesaria) y carga de librerias
+
+
+### Cargar librerías
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+```
+
+
+## Extracion del achivo csv y carga de datos
+
+
+### Cargar datos en la variable data
+
+```{r}
+data <- read.csv("files/Pokemon.csv")
+View(data)
+```
+
+
+## Exploracion inicial de los datos
+
+
+### Obtener nombre de las columnas
+
+```{r}
+colnames(data)
+```
+### Obtener el tipo las columnas
+
+```{r}
+glimpse(data)
+```
+
+### Realizar copia del conjunto original de datos
+```{r}
+data_copy <- data
+```
+
+
+## Limpieza y tratamiento de datos
+
+### Cambiar nombres de las columnas a español
+
+```{r}
+colnames(data)
+colnames(data) <- c("ID",
+                    "NOMBRE",
+                    "TIPO 1",
+                    "TIPO 2",
+                    "TOTAL",
+                    "PUNTOS SALUD",
+                    "ATAQUE",
+                    "DEFENSA",
+                    "ATAQUE ESPECIAL",
+                    "DEFENSA ESPECIAL",
+                    "VELOCIDAD",
+                    "GENERACION",
+                    "LEGENDARIO"
+                    )
+colnames(data)
+```
+### Revision existencia de variables genericas o no funcionales para el analisis
+
+```{r}
+head(data)
+glimpse(data)
+```
+### Eliminacion columna innecesaria
+
+```{r}
+data <- subset(data, select = -LEGENDARIO)
+View(data)
+```
+
+### Encontrar duplicados y eliminarlos
+
+```{r}
+duplicados <- duplicated(data$ID)
+data <- data[!duplicados, ]
+rm(duplicados)
+View(data)
+```
+### Convertir categoricas a factor
+
+```{r}
+data$NOMBRE <- as.factor(data$NOMBRE)
+data[["TIPO 1"]] <- as.factor(data[["TIPO 1"]])
+data[["TIPO 2"]] <- as.factor(data[["TIPO 2"]])
+```
+
+### Convertir numericas a numeric o double
+```{r}
+data$TOTAL <- as.numeric(data$TOTAL)
+data[["PUNTOS SALUD"]] <- as.numeric(data[["PUNTOS SALUD"]])
+data$ATAQUE <- as.numeric(data$ATAQUE)
+data$DEFENSA <- as.numeric(data$DEFENSA)
+data[["ATAQUE ESPECIAL"]] <- as.numeric(data[["ATAQUE ESPECIAL"]])
+data[["DEFENSA ESPECIAL"]] <- as.numeric(data[["DEFENSA ESPECIAL"]])
+data$VELOCIDAD <- as.numeric(data$VELOCIDAD)
+data$GENERACION <- as.numeric(data$GENERACION)
+```
+
+### Verificar cambios
+
+```{r}
+str(data)
+```
+### Determinar valores nulos en el conjunto de datos
+
+```{r}
+if (sum(is.na(data)) == 0) {
+  cat("No existen datos nulos\n")
+} else {
+  # Mostrar las posiciones de los valores nulos
+  cat("Posiciones de los valores nulos:\n")
+  print(which(is.na(data), arr.ind = TRUE))
+}
+```
+### Determinar valores atipicos en el conjunto de datos y definir margenes
+
+```{r}
+par(mfrow = c(3, 3))
+
+boxplot(data$TOTAL, main = "Boxplot de TOTAL\n", col = "lightblue")
+boxplot_total <- boxplot.stats(data$TOTAL)
+outliers_total <- boxplot_total$out
+lower_total <- boxplot_total$stats[1]
+upper_total <- boxplot_total$stats[5]
+mtext(paste("Atípicos: ", length(outliers_total), " | Márgenes: ", round(lower_total, 2), ", ", round(upper_total, 2)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$`PUNTOS SALUD`, main = "Boxplot de PUNTOS SALUD\n", col = "lightgreen")
+boxplot_puntos_salud <- boxplot.stats(data$`PUNTOS SALUD`)
+outliers_puntos_salud <- boxplot_puntos_salud$out
+lower_puntos_salud <- boxplot_puntos_salud$stats[1]
+upper_puntos_salud <- boxplot_puntos_salud$stats[5]
+mtext(paste("Atípicos: ", length(outliers_puntos_salud), " | Márgenes: ", round(lower_puntos_salud, 2), ", ", round(upper_puntos_salud, 2)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$ATAQUE, main = "Boxplot de ATAQUE\n", col = "lightcoral")
+boxplot_ataque <- boxplot.stats(data$ATAQUE)
+outliers_ataque <- boxplot_ataque$out
+lower_ataque <- boxplot_ataque$stats[1]
+upper_ataque <- boxplot_ataque$stats[5]
+mtext(paste("Atípicos: ", length(outliers_ataque), " | Márgenes: ", round(lower_ataque, 2), ", ", round(upper_ataque, 2)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$DEFENSA, main = "Boxplot de DEFENSA\n", col = "lightyellow")
+boxplot_defensa <- boxplot.stats(data$DEFENSA)
+outliers_defensa <- boxplot_defensa$out
+lower_defensa <- boxplot_defensa$stats[1]
+upper_defensa <- boxplot_defensa$stats[5]
+mtext(paste("Atípicos: ", length(outliers_defensa), " | Márgenes: ", round(lower_defensa, 2), ", ", round(upper_defensa, 2)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$`ATAQUE ESPECIAL`, main = "Boxplot de ATAQUE ESPECIAL\n", col = "lightpink")
+boxplot_ataque_especial <- boxplot.stats(data$`ATAQUE ESPECIAL`)
+outliers_ataque_especial <- boxplot_ataque_especial$out
+lower_ataque_especial <- boxplot_ataque_especial$stats[1]
+upper_ataque_especial <- boxplot_ataque_especial$stats[5]
+mtext(paste("Atípicos: ", length(outliers_ataque_especial), " | Márgenes: ", round(lower_ataque_especial, 2), ", ", round(upper_ataque_especial, 2)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$`DEFENSA ESPECIAL`, main = "Boxplot de DEFENSA ESPECIAL\n", col = "lightyellow")
+boxplot_defensa_especial <- boxplot.stats(data$`DEFENSA ESPECIAL`)
+outliers_defensa_especial <- boxplot_defensa_especial$out
+lower_defensa_especial <- boxplot_defensa_especial$stats[1]
+upper_defensa_especial <- boxplot_defensa_especial$stats[5]
+mtext(paste("Atípicos: ", length(outliers_defensa_especial), " | Márgenes: ", round(lower_defensa_especial, 2), ", ", round(upper_defensa_especial, 2)), side = 3, line = 0.5, cex = 0.8)
+
+boxplot(data$VELOCIDAD, main = "Boxplot de VELOCIDAD\n", col = "red")
+boxplot_velocidad <- boxplot.stats(data$VELOCIDAD)
+outliers_velocidad <- boxplot_velocidad$out
+lower_velocidad <- boxplot_velocidad$stats[1]
+upper_velocidad <- boxplot_velocidad$stats[5]
+mtext(paste("Atípicos: ", length(outliers_velocidad), " | Márgenes: ", round(lower_velocidad, 2), ", ", round(upper_velocidad, 2)), side = 3, line = 0.5, cex = 0.8)
+
+par(mfrow = c(1, 1))
+
+
+```
