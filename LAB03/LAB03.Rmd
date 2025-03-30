@@ -187,14 +187,13 @@ upper_velocidad <- boxplot_velocidad$stats[5]
 mtext(paste("Atípicos: ", length(outliers_velocidad), " | Márgenes: ", round(lower_velocidad, 2), ", ", round(upper_velocidad, 2)), side = 3, line = 0.5, cex = 0.8)
 
 par(mfrow = c(1, 1))
-
-
 ```
+
 ### Determinar tendencia de variables usando histogramas y graficos de dispersion
+
 
 ### Histogramas
 ```{r}
-
 hist(data$TOTAL, main = "Histograma de TOTAL", col = "lightblue", xlab = "TOTAL", border = "blue")
 hist(data$`PUNTOS SALUD`, main = "Histograma de PUNTOS SALUD", col = "lightgreen", xlab = "PUNTOS SALUD", border = "black")
 hist(data$ATAQUE, main = "Histograma de ATAQUE", col = "lightcoral", xlab = "ATAQUE", border = "black")
@@ -221,6 +220,7 @@ plot(data$VELOCIDAD, main = "Dispersión de VELOCIDAD", xlab = "Índice", ylab =
 ### Funciones para manejar valores atipicos y cadenas vacias
 
 ### Manejar cadenas vacias
+
 ```{r}
 reemplazar_vacios <- function(data, columna, valor_reemplazo = "Sin especificar") {
   if (is.factor(data[[columna]])) {
@@ -238,6 +238,7 @@ reemplazar_vacios <- function(data, columna, valor_reemplazo = "Sin especificar"
 ```
 
 ### Manejar datos atipicos
+
 ```{r}
 manejar_atipicos <- function(data) {
   for (i in seq_along(data)) {
@@ -309,6 +310,7 @@ par(mfrow = c(1, 1))
 
 ```
 
+
 ## Visualizacion de datos
 
 ### Funcion para graficar las variables categoricas
@@ -324,6 +326,8 @@ graficar_categoricas <- function(data, columna) {
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }
 ```
+
+
 ### Graficar variables categoricas mediante el uso de la funcion
 
 ```{r}
