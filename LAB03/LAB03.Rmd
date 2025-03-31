@@ -334,6 +334,61 @@ graficar_categoricas <- function(data, columna) {
 graficar_categoricas(data, "TIPO 1")  
 graficar_categoricas(data, "TIPO 2")  
 ```
-
 ## Anális de relaciones de datos
 ### Análisis Univariable y Bivariable
+
+### Análisis Univariable: El análisis univariable consiste en explorar una sola variable a la vez.
+
+#### Medidas de tendencia central y dispersión
+```{r}
+summary(data[, c("TOTAL", "PUNTOS SALUD", "ATAQUE", "DEFENSA", "ATAQUE ESPECIAL", "DEFENSA ESPECIAL", "VELOCIDAD")])
+```
+
+#### Distribución de cada variable numérica
+```{r}
+library(ggplot2)
+
+ggplot(data, aes(x = TOTAL)) + 
+  geom_histogram(bins = 30, fill = "blue", alpha = 0.6) +
+  labs(title = "Distribución de TOTAL", x = "TOTAL", y = "Frecuencia")
+```
+
+### Análisis Bivariable: El análisis bivariable examina la relación entre dos variables.
+
+#### Matriz de correlación
+```{r}
+cor_matrix <- cor(data[, c("TOTAL", "PUNTOS SALUD", "ATAQUE", "DEFENSA", "ATAQUE ESPECIAL", "DEFENSA ESPECIAL", "VELOCIDAD")])
+print(cor_matrix)
+```
+
+#### Si deseas visualizar la matriz de correlación
+```{r}
+library(ggcorrplot)
+ggcorrplot(cor_matrix, lab = TRUE, hc.order = TRUE, type = "lower")
+```
+
+#### Diagramas de dispersión para ver relaciones entre variables
+```{r}
+ggplot(data, aes(x = ATAQUE, y = TOTAL)) +
+  geom_point(color = "blue") +
+  labs(title = "Relación entre Ataque y Total", x = "Ataque", y = "Total")
+```
+
+#### Prueba estadística de correlación
+```{r}
+cor.test(data$ATAQUE, data$TOTAL)
+```
+### Normalización o Escalado de Variables
+#### Estandarización (Z-score)
+```{r}
+data_scaled <- as.data.frame(scale(data[, c("TOTAL", "PUNTOS SALUD", "ATAQUE", "DEFENSA", "ATAQUE ESPECIAL", "DEFENSA ESPECIAL", "VELOCIDAD")]))
+```
+
+#### Normalización (Min-Max)
+```{r}
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
+data_normalized <- as.data.frame(lapply(data[, c("TOTAL", "PUNTOS SALUD", "ATAQUE", "DEFENSA", "ATAQUE ESPECIAL", "DEFENSA ESPECIAL", "VELOCIDAD")], normalize))
+```
