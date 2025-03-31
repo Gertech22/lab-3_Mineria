@@ -334,3 +334,6 @@ graficar_categoricas <- function(data, columna) {
 graficar_categoricas(data, "TIPO 1")  
 graficar_categoricas(data, "TIPO 2")  
 ```
+
+## Anális de relaciones de datos
+### Análisis Univariable y Bivariable
